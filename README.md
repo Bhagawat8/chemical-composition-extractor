@@ -99,6 +99,7 @@ European certificates often use German notation: `0,004` instead of `0.004`. The
 codebase/
     run.py                      # CLI entry point
     requirements.txt            # Python dependencies
+    Dockerfile                  # Container configuration
     Submission_notebook.ipynb   # Jupyter notebook for interactive use
     README.md                   # This documentation
     .gitignore                  # Git ignore rules
@@ -332,6 +333,14 @@ print(df)
 
 Open `Submission_notebook.ipynb` and run cells sequentially. The notebook includes installation cells for cloud environments.
 
+---
+
+### 🐳 Docker
+
+Build the Docker image:
+
+```bash
+docker build -t chemical-composition-extractor .
 ---
 
 ## 🛠️ Development Notes
