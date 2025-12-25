@@ -341,6 +341,8 @@ Build the Docker image:
 
 ```bash
 docker build -t chemical-composition-extractor .
+
+```
 ---
 
 ## 🛠️ Development Notes
