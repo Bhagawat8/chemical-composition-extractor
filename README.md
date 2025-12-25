@@ -1,6 +1,6 @@
 # Chemical Composition Extraction from Material Certificates
 
-A document intelligence pipeline that extracts chemical composition data from material certificate PDFs using DeepSeek-OCR, a vision-language model optimized for document understanding.
+A document intelligence pipeline that extracts chemical composition data and other information from PDFs using DeepSeek-OCR, a vision-language model optimized for document understanding.
 
 ---
 
@@ -12,7 +12,7 @@ This project automates the entire extraction process. You give it a PDF, it retu
 
 The core challenge was not just OCR, but understanding document structure. Traditional OCR tools like Tesseract can read text, but they cannot understand that "6.53 - 6.54" under "AL" in a table means Aluminum content is in that range. We needed something smarter.
 
-After evaluating multiple approaches including Tesseract with layout analysis, Google Vision API, and various open-source alternatives, we settled on DeepSeek-OCR. It is a vision-language model that understands documents the way humans do: visually. It outputs structured markdown with tables intact, which makes parsing significantly easier.
+After evaluating multiple approaches including Tesseract with layout analysis and various open-source alternatives, we settled on DeepSeek-OCR. It is a vision-language model that understands documents the way humans do: visually. It outputs structured markdown with tables intact, which makes parsing significantly easier.
 
 ---
 
@@ -26,7 +26,7 @@ After evaluating multiple approaches including Tesseract with layout analysis, G
 | System RAM | 16GB | 32GB |
 | Storage | 20GB free | SSD preferred |
 
-**GPU is mandatory.** DeepSeek-OCR is a 7-billion parameter vision-language model. CPU inference takes 10+ minutes per page, making it impractical.
+**GPU is mandatory.** DeepSeek-OCR is a 7-billion parameter vision-language model. CPU inference takes 10+ minutes per page with vanilla attention algorithm, making it inefficient.
 
 ### Why Flash Attention is Default
 
@@ -57,14 +57,15 @@ Model loading takes ~30 seconds on first run. Subsequent pages process faster wi
 
 ### What This Pipeline Does
 
-1. Takes any material certificate PDF as input
+1. Takes any PDF file as input
 2. Converts PDF pages to high-resolution images (400 DPI)
 3. Automatically corrects image orientation using Tesseract OSD
-4. Runs DeepSeek-OCR to extract text with structure preserved
-5. Parses the OCR output to identify chemical composition tables
-6. Handles German number formats (comma as decimal separator)
-7. Distinguishes between requirement values and actual test results
-8. Exports clean CSV with element data and certificate metadata
+4. Runs DeepSeek-OCR on each images individually to extract text with structure preserved
+5. Merged the OCR extracted text of all images.
+6. Parses the OCR output to identify chemical composition tables
+7. Handles German number formats (comma as decimal separator) and other irregularity
+8. Distinguishes between requirement values and actual test results
+9. Exports clean CSV with element data and PDF's metadata
 
 ### Key Technical Decisions
 
@@ -95,7 +96,6 @@ codebase/
     Submission_notebook.ipynb   # Jupyter notebook for interactive use
     README.md                   # This documentation
     .gitignore                  # Git ignore rules
-    task.docx                   # Assignment description
     src/
         __init__.py             # Package exports
         config.py               # Settings and element lookup
@@ -189,7 +189,7 @@ Pipeline orchestration:
 
 ---
 
-## Workflow
+## High Level Workflow
 
 ```
                     +------------------+
@@ -252,7 +252,6 @@ Each step has a single responsibility. If the CSV is wrong, check the parser. If
 
 - **GPU required**: CPU inference is too slow for practical use
 - **Single certificate per PDF**: Multi-certificate PDFs merge data incorrectly
-- **Printed text only**: Handwritten notes not supported
 - **Latin alphabet**: Element symbols must be in standard notation
 - **OCR accuracy**: Values like 0.004 and 0.0004 can be confused on poor prints
 
@@ -262,7 +261,6 @@ Each step has a single responsibility. If the CSV is wrong, check the parser. If
 
 - Confidence scores for extracted values
 - Multi-certificate PDF support
-- Web interface (Flask/Streamlit)
 - Batch processing with database output
 - Fine-tuned model for material certificates
 
